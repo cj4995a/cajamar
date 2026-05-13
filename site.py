@@ -1,20 +1,7 @@
 from flask import Flask, render_template_string, request, redirect
-import os
-import json
 from datetime import datetime
 
 app = Flask(__name__)
-
-# =========================================================
-# PASTAS
-# =========================================================
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-DATA_DIR = os.path.join(BASE_DIR, "data")
-os.makedirs(DATA_DIR, exist_ok=True)
-
-CONFIG_FILE = os.path.join(DATA_DIR, "config.json")
 
 # =========================================================
 # UNIDADES
@@ -52,35 +39,29 @@ DIAS_SEMANA = [
 # CONFIG
 # =========================================================
 
-def carregar_config():
-
-    if not os.path.exists(CONFIG_FILE):
-
-        config = {
-            key: {
-                "HORARIOS": [
-                    {
-                        "hora": "08:00",
-                        "dias": ["0", "1", "2", "3", "4"]
-                    }
-                ],
-                "STATUS": "Parado",
-                "ULTIMA_EXECUCAO": "-"
+CONFIG_PADRAO = {
+    key: {
+        "HORARIOS": [
+            {
+                "hora": "08:00",
+                "dias": ["0", "1", "2", "3", "4"]
             }
-            for key in UNIDADES_CONFIG
-        }
+        ],
+        "STATUS": "Parado",
+        "ULTIMA_EXECUCAO": "-"
+    }
+    for key in UNIDADES_CONFIG
+}
 
-        salvar_config(config)
+CONFIG_GLOBAL = CONFIG_PADRAO.copy()
 
-        return config
-
-    with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+def carregar_config():
+    global CONFIG_GLOBAL
+    return CONFIG_GLOBAL
 
 def salvar_config(config):
-
-    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump(config, f, indent=4, ensure_ascii=False)
+    global CONFIG_GLOBAL
+    CONFIG_GLOBAL = config
 
 # =========================================================
 # HTML
